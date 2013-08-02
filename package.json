@@ -1,0 +1,13 @@
+{
+    "name": "threejs-docset-gen",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "node app"
+    },
+    "dependencies": {
+        "sqlite3": "2.1.14",
+        "phantom": "0.5.2",
+        "ncp": "0.4.2"
+    }
+}
