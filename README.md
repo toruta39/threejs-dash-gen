@@ -19,3 +19,4 @@ Automatically generate three.js docset for local browsing in [Dash](http://kapel
 * Implement a local server in node.js
 * Add index page
 * Host a feed
+* Add entries on properties and methods
