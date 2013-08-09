@@ -2,14 +2,22 @@ fs = require 'fs'
 vm = require 'vm'
 util = require 'util'
 ncp = require('ncp').ncp
+connect = require 'connect'
 phantom = require 'phantom'
 sqlite3 = require('sqlite3').verbose()
 
 pages = []
 data = []
 dbFile = 'threejs.docset/Contents/Resources/docSet.dsidx'
+server = null
 
-# TODO: Start a local server on ./html
+localServerPort = 9999
+
+startLocalServer = ->
+  server = connect()
+    .use(connect.static 'three.js/docs')
+    .listen localServerPort
+  console.log "Local server started at http://localhost:#{localServerPort}"
 
 prepareDocuments = (callback) ->
   _rmrf = (path) ->
@@ -74,9 +82,9 @@ getData = (urlList, callback) ->
   phantom.create (ph) ->
     ph.createPage (page) ->
       _readPage = () ->
-        page.open "http://localhost:8000/#{urlList[_i]}", (status) ->
+        page.open "http://localhost:#{localServerPort}/#{urlList[_i]}", (status) ->
           page.evaluate (-> document.querySelector('h1').innerHTML), (result) ->
-            console.log "http://localhost:8000/#{urlList[_i]}: #{result}"
+            # console.log "http://localhost:#{localServerPort}/#{urlList[_i]}: #{result}"
             data.push
               $name: result
               $type: 'Class'
@@ -92,6 +100,17 @@ getData = (urlList, callback) ->
 
 
 writeSQLite = (data) ->
+  writeCount = 0
+  db = null
+
+  progress = (isRecordAdded) ->
+    writeCount++ if isRecordAdded
+    if writeCount is data.length
+      console.log 'Finished writing db.'
+      db.close()
+      server.close()
+      process.exit()
+
   fs.unlink dbFile, () ->
     db = new sqlite3.Database dbFile
 
@@ -100,18 +119,19 @@ writeSQLite = (data) ->
       db.run "CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);"
 
       for item in data
-        db.run "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);", [
-          item.$name
-          item.$type
-          item.$path
-        ]
+        if item.$name?
+          db.run "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);", [
+            item.$name
+            item.$type
+            item.$path
+          ], ->
+            progress(true)
+        else
+          progress(true)
 
-    db.close()
 
-
-
+startLocalServer()
 prepareDocuments () ->
   urlList = getPageListFromJSON()
-  console.log util.inspect urlList
   getData urlList, () ->
     writeSQLite data

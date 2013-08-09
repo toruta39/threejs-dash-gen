@@ -15,7 +15,6 @@ For installing docset:
 For generating:
 
 * Clone this repo: `git clone --recursive https://github.com/toruta39/threejs-dash-gen`
-* Start a local server: `cd threejs-dash-gen/three.js/docs && python -m SimpleHTTPServer`
 * Install dependencies and run in the repo's root directory: `npm install && npm start`
 * Double click threejs.docset to install
 
@@ -24,7 +23,7 @@ You can checkout any certain revision of three.js in the submodule to generate a
 ## Roadmap
 
 * ~~Use submodule to manage three.js repo~~
-* Implement a local server in node.js
+* ~~Implement a local server with connect~~
 * Add index page
 * Add an icon
 * Host a feed

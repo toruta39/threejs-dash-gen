@@ -8,6 +8,7 @@
     "dependencies": {
         "sqlite3": "2.1.14",
         "phantom": "0.5.2",
-        "ncp": "0.4.2"
+        "ncp": "0.4.2",
+        "connect": "2.8.4"
     }
 }
