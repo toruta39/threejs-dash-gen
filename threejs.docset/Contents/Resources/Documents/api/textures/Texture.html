@@ -30,7 +30,7 @@
 
 		<h3>.[page:Image image]</h3>
 		<div>
-		An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map.
+		An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing.
 		</div>
 
 		<h3>.[page:object mapping]</h3>
@@ -132,15 +132,12 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>.clone([page:todo texture]) [page:todo]</h3>
+		<h3>.clone([page:Texture texture])</h3>
 		<div>
 		Make copy of texture. Note this is not a "deep copy", the image is shared.
 		</div>
-		<div>
-		todo
-		</div>
 
-		<h3>.dispose() [page:todo]</h3>
+		<h3>.dispose()</h3>
 		<div>
 		Call [page:EventDispatcher EventDispatcher].dispatchEvent with a 'dispose' event type.
 		</div>

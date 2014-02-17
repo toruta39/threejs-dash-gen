@@ -40,13 +40,13 @@
 		<h3>.[page:float near]</h3>
 		<div>
 		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
-		This value shouldn't be negative and should be smaller then the far property. 
+		This value shouldn't be negative and should be smaller than the far property. 
 		</div>
 
 		<h3>.[page:float far]</h3>
 		<div>
 		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
-		This value shouldn't be negative and should be smaller then the far property. 
+		This value shouldn't be negative and should be larger than the near property. 
 		</div>
 
 		<h3>.[page:float precision]</h3>
@@ -71,7 +71,10 @@
 		[page:Boolean recursive] — If set, it also checks all descendants. Otherwise it only checks intersecton with the object.
 		</div>
 		<div>
-		checks all intersection between the ray and the object with or without the descendants.
+		checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first.
+        <code>
+            [ { distance, point, face, faceIndex, object }, ... ]
+        </code>
 		</div>
 
 		<h3>.intersectObjects( [page:Array objects], [page:Boolean recursive] )</h3>
@@ -80,7 +83,10 @@
 		[page:Boolean recursive] — If set, it also checks all descendants of the objects. Otherwise it only checks intersecton with the objects.
 		</div>
 		<div>
-		checks all intersection between the ray and the objects with or without the descendants.
+		checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first.
+        <code>
+            [ { distance, point, face, faceIndex, object }, ... ]
+        </code>
 		</div>
 
 
