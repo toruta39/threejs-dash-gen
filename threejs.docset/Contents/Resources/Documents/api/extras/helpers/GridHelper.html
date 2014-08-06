@@ -7,6 +7,8 @@
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
 	</head>
 	<body>
+		[page:Line] &rarr;
+		
 		<h1>[name]</h1>
 
 		<div class="desc">The GridHelper is an object to define grids. Grids are two-dimensional arrays of lines.</div>
@@ -16,11 +18,8 @@
 
 		<code>var size = 10;
 		var step = 1;
-		var gridHelper = new THREE.GridHelper( size, step );
-		
-		gridHelper.position = new THREE.Vector3( 10, 10, 0 );
-		gridHelper.rotation = new THREE.Euler( 15, 0, 0 );
-		
+
+		var gridHelper = new THREE.GridHelper( size, step );		
 		scene.add( gridHelper );
 		</code>
 

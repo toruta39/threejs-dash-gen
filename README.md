@@ -14,6 +14,7 @@ For installing docset:
 
 For generating:
 
+* Install Node and PhantomJS if you haven't installed it yet.
 * Clone this repo: `git clone --recursive https://github.com/toruta39/threejs-dash-gen`
 * Install dependencies and run in the repo's root directory: `npm install && npm start`
 * Double click threejs.docset to install
