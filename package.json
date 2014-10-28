@@ -1,14 +1,16 @@
 {
-    "name": "threejs-docset-gen",
-    "version": "0.0.1",
-    "private": true,
-    "scripts": {
-        "start": "node app"
-    },
-    "dependencies": {
-        "sqlite3": "2.1.14",
-        "phantom": "0.5.2",
-        "ncp": "0.4.2",
-        "connect": "2.8.4"
-    }
+  "name": "threejs-docset-gen",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "connect": "2.8.4",
+    "event-stream": "^3.1.7",
+    "ncp": "0.4.2",
+    "phantom": "0.5.2",
+    "q": "^1.0.1",
+    "sqlite3": "2.1.14"
+  }
 }
