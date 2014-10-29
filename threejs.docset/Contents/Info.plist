@@ -14,5 +14,7 @@
     <string>index.html</string>
     <key>isJavaScriptEnabled</key>
     <true/>
+    <key>DashDocSetFamily</key>
+    <string>dashtoc</string>
 </dict>
 </plist>

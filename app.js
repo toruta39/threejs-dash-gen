@@ -52,7 +52,7 @@
       return ncp('three.js/docs', 'threejs.docset/Contents/Resources/docs', {
         transform: function(read, write) {
           if (/\.html$/ig.test(read.path)) {
-            read = read.pipe(es.replace('<script src="../../page.js"></script>', '<script src="../../page.js"></script>' + '<script src="../../offline.js"></script>'));
+            read = read.pipe(es.replace('<script src="../../page.js"></script>', '<script src="../../page.js"></script>' + '<script src="../../offline.js"></script>')).pipe(es.replace('<script src="../../../page.js"></script>', '<script src="../../../page.js"></script>' + '<script src="../../../offline.js"></script>')).pipe(es.replace('<script src="../../../../page.js"></script>', '<script src="../../../../page.js"></script>' + '<script src="../../../../offline.js"></script>'));
           }
           return read.pipe(write);
         }
@@ -152,9 +152,9 @@
                     type = (function() {
                       switch (type.innerText) {
                         case 'Properties':
-                          return 'clp';
+                          return 'Property';
                         case 'Methods':
-                          return 'clm';
+                          return 'Method';
                         default:
                           return false;
                       }
@@ -181,7 +181,7 @@
                 console.log(("http://localhost:" + localServerPort) + ("/" + urlList[_i] + ": " + result.name));
                 data.push({
                   $name: result.name,
-                  $type: 'cl',
+                  $type: 'Class',
                   $path: urlList[_i]
                 });
                 if (result.members.length) {

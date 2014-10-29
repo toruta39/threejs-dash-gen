@@ -43,10 +43,20 @@ prepareDocuments = ->
       {
         transform: (read, write)->
           if /\.html$/ig.test read.path
-            read = read.pipe es.replace(
-              '<script src="../../page.js"></script>',
-              '<script src="../../page.js"></script>' +
-              '<script src="../../offline.js"></script>')
+            read = read
+              .pipe es.replace(
+                '<script src="../../page.js"></script>',
+                '<script src="../../page.js"></script>' +
+                '<script src="../../offline.js"></script>')
+              .pipe es.replace(
+                '<script src="../../../page.js"></script>',
+                '<script src="../../../page.js"></script>' +
+                '<script src="../../../offline.js"></script>')
+              .pipe es.replace(
+                '<script src="../../../../page.js"></script>',
+                '<script src="../../../../page.js"></script>' +
+                '<script src="../../../../offline.js"></script>')
+
           read.pipe write
       },
       (err)->
@@ -126,8 +136,8 @@ getData = (urlList)->
 
                     if type
                       type = switch type.innerText
-                        when 'Properties' then 'clp'
-                        when 'Methods' then 'clm'
+                        when 'Properties' then 'Property'
+                        when 'Methods' then 'Method'
                         else false
 
                     if type
@@ -153,7 +163,7 @@ getData = (urlList)->
 
                 data.push
                   $name: result.name
-                  $type: 'cl'
+                  $type: 'Class'
                   $path: urlList[_i]
 
                 if result.members.length

@@ -1,5 +1,62 @@
 document.addEventListener('DOMContentLoaded', function() {
   document.body.innerHTML = document.body.innerHTML.replace(/window\.parent\.goTo/g, 'window.offlineGoTo');
+
+  // Remove Edit button
+  document.querySelector('#button').style.display = 'none';
+
+  // Add table of contents support for Dash
+  var constructor = [].filter.call(document.querySelectorAll('h2'),
+    function(el) {
+      return el.innerText === 'Constructor';
+    })[0];
+
+  if (constructor &&
+    constructor.nextElementSibling.tagName === 'H3') {
+
+    constructor = constructor.nextElementSibling;
+    var parenthese = constructor.innerHTML.indexOf('(');
+    var anchor = document.createElement('a');
+    anchor.classList.add('dashAnchor');
+    anchor.name = '//apple_ref/cpp/Constructor/' +
+      constructor.innerHTML.substr(0, parenthese);
+
+    constructor.insertBefore(anchor, constructor.childNodes[0]);
+  }
+
+  [].forEach.call(document.querySelectorAll('a[id]'), function(el) {
+    var type = el;
+
+    while (type) {
+      if (type.tagName === 'H3') break;
+      type = type.parentNode;
+    }
+
+    while (type) {
+      if (type.tagName === 'H2') break;
+      type = type.previousElementSibling;
+    }
+
+    if (type) {
+      switch (type.innerText) {
+        case 'Properties':
+          type = 'Property';
+          break;
+        case 'Methods':
+          type = 'Method';
+          break;
+        default:
+          type = false;
+      }
+    }
+
+    if (type) {
+      el.classList.add('dashAnchor');
+      el.name = '//apple_ref/cpp/' + type + '/' + el.innerText;
+    } else {
+      return false;
+    }
+  });
+
 }, false);
 
 var DELIMITER = '/';
@@ -19,7 +76,7 @@ for ( var section in list ) {
       };
 
       if (~window.location.pathname.indexOf(page[1])) {
-        document.title = section + ' - ' + page[0];
+        document.title = page[0];
       }
 
     }
