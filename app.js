@@ -116,7 +116,7 @@
         }
         return _results;
       };
-      grabURLFromJSON(_data.pages.Reference);
+      grabURLFromJSON(_data.pages);
       return resolve(urlList);
     });
   };
@@ -178,10 +178,12 @@
                   members: members
                 };
               }, function(result) {
+                var type;
                 console.log(("http://localhost:" + localServerPort) + ("/" + urlList[_i] + ": " + result.name));
+                type = urlList[_i].indexOf('manual/') === 0 ? 'Guide' : ~urlList[_i].indexOf('/constants/') ? 'Constant' : 'Class';
                 data.push({
                   $name: result.name,
-                  $type: 'Class',
+                  $type: type,
                   $path: urlList[_i]
                 });
                 if (result.members.length) {
@@ -227,7 +229,7 @@
         db = new sqlite3.Database(dbFile);
         return db.serialize(function() {
           var item, _i, _len, _results;
-          db.run("CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);");
+          db.run("CREATE TABLE searchIndex (id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);");
           db.run("CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);");
           _results = [];
           for (_i = 0, _len = data.length; _i < _len; _i++) {

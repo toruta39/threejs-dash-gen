@@ -108,7 +108,7 @@ getPageListFromJSON = ->
         else
           urlList.push obj[i] + '.html'
 
-    grabURLFromJSON _data.pages.Reference
+    grabURLFromJSON _data.pages
     resolve urlList
 
 getData = (urlList)->
@@ -161,9 +161,15 @@ getData = (urlList)->
                 console.log "http://localhost:#{localServerPort}" +
                   "/#{urlList[_i]}: #{result.name}"
 
+                type = if urlList[_i].indexOf('manual/') is 0
+                then 'Guide'
+                else if ~urlList[_i].indexOf '/constants/'
+                then 'Constant'
+                else 'Class'
+
                 data.push
                   $name: result.name
-                  $type: 'Class'
+                  $type: type
                   $path: urlList[_i]
 
                 if result.members.length
@@ -198,12 +204,15 @@ writeSQLite = (data)->
       db = new sqlite3.Database dbFile
 
       db.serialize ->
-        db.run "CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);"
-        db.run "CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);"
+        db.run "CREATE TABLE searchIndex
+          (id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);"
+        db.run "CREATE UNIQUE INDEX anchor ON searchIndex
+          (name, type, path);"
 
         for item in data
           if item.$name?
-            db.run "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);", [
+            db.run "INSERT OR IGNORE INTO searchIndex(name, type, path)
+              VALUES (?, ?, ?);", [
               item.$name
               item.$type
               item.$path
