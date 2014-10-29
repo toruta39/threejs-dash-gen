@@ -21,11 +21,3 @@ For generating:
 
 You can checkout any revision of three.js submodule to generate.
 
-## Roadmap
-
-* ~~Use submodule to manage three.js repo~~
-* ~~Implement a local server with connect~~
-* Add index page
-* Add an icon
-* Host a feed
-* ~~Add entries on properties and methods~~
