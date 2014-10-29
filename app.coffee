@@ -122,12 +122,12 @@ getData = (urlList)->
           page.open "http://localhost:#{localServerPort}/#{urlList[_i]}",
             (status)->
               page.evaluate ->
-                members = [].map.call document.querySelectorAll('a[id]'),
+                members = [].map.call document.querySelectorAll('.dashAnchor[id]'),
                   (el)->
                     type = el
 
-                    while type
-                      break if type.tagName is 'H3'
+                    while type.parentNode
+                      break if type.parentNode.tagName is 'BODY'
                       type = type.parentNode
 
                     while type
@@ -135,10 +135,10 @@ getData = (urlList)->
                       type = type.previousElementSibling
 
                     if type
-                      type = switch type.innerText
-                        when 'Properties' then 'Property'
-                        when 'Methods' then 'Method'
-                        else false
+                      type = switch
+                        when /properties/i.test type.innerText then 'Property'
+                        when /methods/i.test type.innerText then 'Method'
+                        else ''
 
                     if type
                       {

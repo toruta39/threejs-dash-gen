@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
   [].forEach.call(document.querySelectorAll('a[id]'), function(el) {
     var type = el;
 
-    while (type) {
-      if (type.tagName === 'H3') break;
+    while (type.parentNode) {
+      if (type.parentNode.tagName === 'BODY') break;
       type = type.parentNode;
     }
 
@@ -37,11 +37,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (type) {
-      switch (type.innerText) {
-        case 'Properties':
+      switch (true) {
+        case /properties/i.test(type.innerText):
           type = 'Property';
           break;
-        case 'Methods':
+        case /methods/i.test(type.innerText):
           type = 'Method';
           break;
         default:
