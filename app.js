@@ -86,7 +86,7 @@
         if (/^\./.test(item)) {
 
         } else if (/\.html|\.htm$/i.test(item)) {
-          _results.push(urlList.push(("" + path + "/" + item).replace(new RegExp('^threejs\\.docset\\/Contents\\/Resources\\/Documents\\/', 'gi'), '')));
+          _results.push(urlList.push(("" + path + "/" + item).replace(/^threejs\.docset\/Contents\/Resources\/Documents\//gi, '')));
         } else {
           _results.push(collectHTMLFiles("" + path + "/" + item));
         }
@@ -102,7 +102,7 @@
       var grabURLFromJSON, listJsContent, urlList, _data;
       _data = {};
       urlList = [];
-      listJsContent = fs.readFileSync('threejs.docset/Contents/Resources/Documents/list.js');
+      listJsContent = fs.readFileSync('threejs.docset/Contents/Resources/' + 'Documents/list.js');
       vm.runInNewContext(listJsContent, _data);
       grabURLFromJSON = function(obj) {
         var i, _results;
@@ -131,15 +131,68 @@
           var _readPage;
           _readPage = function() {
             return page.open("http://localhost:" + localServerPort + "/" + urlList[_i], function(status) {
-              return page.evaluate((function() {
-                return document.querySelector('h1').innerHTML;
-              }), function(result) {
-                console.log("http://localhost:" + localServerPort + "/" + urlList[_i] + ": " + result);
+              return page.evaluate(function() {
+                var members;
+                members = [].map.call(document.querySelectorAll('a[id]'), function(el) {
+                  var type;
+                  type = el;
+                  while (type) {
+                    if (type.tagName === 'H3') {
+                      break;
+                    }
+                    type = type.parentNode;
+                  }
+                  while (type) {
+                    if (type.tagName === 'H2') {
+                      break;
+                    }
+                    type = type.previousElementSibling;
+                  }
+                  if (type) {
+                    type = (function() {
+                      switch (type.innerText) {
+                        case 'Properties':
+                          return 'clp';
+                        case 'Methods':
+                          return 'clm';
+                        default:
+                          return false;
+                      }
+                    })();
+                  }
+                  if (type) {
+                    return {
+                      name: el.innerText,
+                      type: type,
+                      hash: el.id
+                    };
+                  } else {
+                    return false;
+                  }
+                });
+                members.filter(function(item) {
+                  return item;
+                });
+                return {
+                  name: document.querySelector('h1').innerHTML,
+                  members: members
+                };
+              }, function(result) {
+                console.log(("http://localhost:" + localServerPort) + ("/" + urlList[_i] + ": " + result.name));
                 data.push({
-                  $name: result,
-                  $type: 'Class',
+                  $name: result.name,
+                  $type: 'cl',
                   $path: urlList[_i]
                 });
+                if (result.members.length) {
+                  result.members.forEach(function(member) {
+                    return data.push({
+                      $name: "" + result.name + "." + member.name,
+                      $type: member.type,
+                      $path: "" + urlList[_i] + "#" + member.hash
+                    });
+                  });
+                }
                 if (++_i < urlList.length) {
                   return _readPage();
                 } else {

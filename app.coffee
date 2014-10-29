@@ -21,7 +21,7 @@ startLocalServer = ->
 
 
 prepareDocuments = ->
-  return Q.Promise (resolve, reject)->
+  Q.Promise (resolve, reject)->
     _rmrf = (path)->
       _fileList = fs.readdirSync path
 
@@ -52,13 +52,15 @@ prepareDocuments = ->
       (err)->
         if err then reject err
 
-        fs.renameSync 'threejs.docset/Contents/Resources/docs', 'threejs.docset/Contents/Resources/Documents'
+        fs.renameSync 'threejs.docset/Contents/Resources/docs',
+          'threejs.docset/Contents/Resources/Documents'
+
         console.log 'Preparation on Documents is done!'
         resolve()
 
 
 injectFiles = ->
-  return Q.Promise (resolve)->
+  Q.Promise (resolve)->
     ncp 'files', 'threejs.docset/Contents/Resources/Documents', resolve
 
 getPageListFromFiles = ->
@@ -71,7 +73,8 @@ getPageListFromFiles = ->
     for item in _dirContent
       if /^\./.test item
       else if /\.html|\.htm$/i.test item
-        urlList.push "#{path}/#{item}".replace new RegExp('^threejs\\.docset\\/Contents\\/Resources\\/Documents\\/', 'gi'), ''
+        urlList.push "#{path}/#{item}".replace(
+          /^threejs\.docset\/Contents\/Resources\/Documents\//gi, '')
       else
         collectHTMLFiles "#{path}/#{item}"
 
@@ -80,11 +83,12 @@ getPageListFromFiles = ->
 
 
 getPageListFromJSON = ->
-  return Q.Promise (resolve)->
+  Q.Promise (resolve)->
     _data = {}
     urlList = []
 
-    listJsContent = fs.readFileSync 'threejs.docset/Contents/Resources/Documents/list.js'
+    listJsContent = fs.readFileSync 'threejs.docset/Contents/Resources/' +
+      'Documents/list.js'
     vm.runInNewContext listJsContent, _data
 
     grabURLFromJSON = (obj)->
@@ -98,32 +102,78 @@ getPageListFromJSON = ->
     resolve urlList
 
 getData = (urlList)->
-  return Q.Promise (resolve)->
+  Q.Promise (resolve)->
     _i = 0
     data = []
 
     phantom.create (ph)->
       ph.createPage (page)->
         _readPage = ->
-          page.open "http://localhost:#{localServerPort}/#{urlList[_i]}", (status)->
-            page.evaluate (-> document.querySelector('h1').innerHTML), (result)->
-              console.log "http://localhost:#{localServerPort}/#{urlList[_i]}: #{result}"
-              data.push
-                $name: result
-                $type: 'Class'
-                $path: urlList[_i]
+          page.open "http://localhost:#{localServerPort}/#{urlList[_i]}",
+            (status)->
+              page.evaluate ->
+                members = [].map.call document.querySelectorAll('a[id]'),
+                  (el)->
+                    type = el
 
-              if ++_i < urlList.length
-                _readPage()
-              else
-                ph.exit()
-                resolve data
+                    while type
+                      break if type.tagName is 'H3'
+                      type = type.parentNode
+
+                    while type
+                      break if type.tagName is 'H2'
+                      type = type.previousElementSibling
+
+                    if type
+                      type = switch type.innerText
+                        when 'Properties' then 'clp'
+                        when 'Methods' then 'clm'
+                        else false
+
+                    if type
+                      {
+                        name: el.innerText
+                        type: type
+                        hash: el.id
+                      }
+                    else
+                      false
+
+                members.filter (item)-> item
+
+                {
+                  name: document.querySelector('h1').innerHTML
+                  members: members
+                }
+
+              , (result)->
+
+                console.log "http://localhost:#{localServerPort}" +
+                  "/#{urlList[_i]}: #{result.name}"
+
+                data.push
+                  $name: result.name
+                  $type: 'cl'
+                  $path: urlList[_i]
+
+                if result.members.length
+                  result.members.forEach (member)->
+                    data.push
+                      $name: "#{result.name}.#{member.name}"
+                      $type: member.type
+                      $path: "#{urlList[_i]}##{member.hash}"
+
+                if ++_i < urlList.length
+                  _readPage()
+                else
+                  ph.exit()
+                  resolve data
 
         _readPage()
 
 
 writeSQLite = (data)->
-  return Q.Promise (resolve)->
+  Q.Promise (resolve)->
     writeCount = 0
     db = null
 
