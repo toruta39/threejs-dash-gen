@@ -9,17 +9,17 @@ Automatically generate three.js docset for local browsing in [Dash](http://kapel
 
 For installing docset:
 
-* Clone this repo: `git clone https://github.com/toruta39/threejs-dash-gen`
-* Double click threejs.docset to install
+* Download ZIP: <https://github.com/toruta39/threejs-dash-gen/archive/master.zip>
+* Unarchive and open **threejs.docset** to install
 
 For generating:
 
-* Install Node and PhantomJS if you haven't installed it yet.
+* Install [node.js](http://nodejs.org/) and [PhantomJS](http://phantomjs.org/) if you haven't installed them yet.
 * Clone this repo: `git clone --recursive https://github.com/toruta39/threejs-dash-gen`
-* Install dependencies and run in the repo's root directory: `npm install && npm start`
-* Double click threejs.docset to install
+* In the repo's root directory, run: `npm install && npm start`
+* Open **threejs.docset** to install
 
-You can checkout any certain revision of three.js in the submodule to generate a three.js docset of that revision, as far as there's the docs directory in the submodule repo.
+You can checkout any revision of three.js submodule to generate.
 
 ## Roadmap
 
@@ -28,4 +28,4 @@ You can checkout any certain revision of three.js in the submodule to generate a
 * Add index page
 * Add an icon
 * Host a feed
-* Add entries on properties and methods
+* ~~Add entries on properties and methods~~
