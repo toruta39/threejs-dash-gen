@@ -15,7 +15,7 @@ localServerPort = 9999
 
 startLocalServer = ->
   server = connect()
-    .use(connect.static 'three.js/docs')
+    .use(connect.static 'threejs.docset/Contents/Resources/Documents')
     .listen localServerPort
   console.log "Local server started at http://localhost:#{localServerPort}"
 
@@ -56,6 +56,12 @@ prepareDocuments = ->
                 '<script src="../../../../page.js"></script>',
                 '<script src="../../../../page.js"></script>' +
                 '<script src="../../../../offline.js"></script>')
+              .pipe es.replace(
+                '<script src="../../build/three.min.js"></script>',
+                '<script src="../three.min.js"></script>')
+              .pipe es.replace(
+                '<script src=\'../../examples/js/libs/dat.gui.min.js\'></script>',
+                '<script src=\'../dat.gui.min.js\'></script>')
 
           read.pipe write
       },
@@ -72,6 +78,10 @@ prepareDocuments = ->
 injectFiles = ->
   Q.Promise (resolve)->
     ncp 'files', 'threejs.docset/Contents/Resources/Documents', resolve
+  .then Q.Promise (resolve)->
+    ncp 'three.js/build/three.min.js', 'threejs.docset/Contents/Resources/Documents/three.min.js', resolve
+  .then Q.Promise (resolve)->
+    ncp 'three.js/examples/js/libs/dat.gui.min.js', 'threejs.docset/Contents/Resources/Documents/dat.gui.min.js', resolve
 
 getPageListFromFiles = ->
   docRoot = 'threejs.docset/Contents/Resources/Documents/api'
@@ -221,9 +231,9 @@ writeSQLite = (data)->
           else
             progress(true)
 
-startLocalServer()
 prepareDocuments()
 .then injectFiles
+.then startLocalServer
 .then getPageListFromJSON
 .then getData
 .then writeSQLite
