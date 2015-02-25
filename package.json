@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "coffee app.coffee"
+    "start": "coffee app.coffee && tar --exclude='.DS_Store' -cvzf threejs.tgz threejs.docset"
   },
   "dependencies": {
     "connect": "2.8.4",
