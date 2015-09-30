@@ -6,11 +6,11 @@
     "start": "coffee app.coffee && tar --exclude='.DS_Store' -cvzf threejs.tgz threejs.docset"
   },
   "dependencies": {
-    "connect": "2.8.4",
-    "event-stream": "^3.1.7",
-    "ncp": "0.4.2",
-    "phantom": "0.5.2",
-    "q": "^1.0.1",
-    "sqlite3": "2.1.14"
+    "connect": "^2.8.4",
+    "event-stream": "^3.3.1",
+    "ncp": "^2.0.0",
+    "phantom": "^0.8.0",
+    "q": "^1.4.1",
+    "sqlite3": "^3.1.0"
   }
 }

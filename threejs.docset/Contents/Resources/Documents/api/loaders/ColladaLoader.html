@@ -2,15 +2,16 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<script src="../../list.js"></script>
-		<script src="../../page.js"></script><script src="../../offline.js"></script>
-		<link type="text/css" rel="stylesheet" href="../../page.css" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an <em>.babylon</em> resource.</div>
+		<div class="desc">A loader for <em>Collada</em> files.</div>
 
 
 		<h2>Constructor</h2>
@@ -66,7 +67,7 @@
 		</div>
 		<div>
 		Set the .[page:Integer shading] property on the resource's materials.<br />
-		Options are [page:Materials THREE.SmoothShading], [page:Materials THREE.FlatShading], [page:Materials THREE.NoShading].
+		Options are [page:Materials THREE.SmoothShading], [page:Materials THREE.FlatShading].
 		</div>
 
 		<h3>[method:null applySkin]( [page:Geometry geometry], [page:Object instanceCtrl], [page:Integer frame] )</h3>
@@ -86,7 +87,6 @@
 		// instantiate a loader
 		var loader = new THREE.ColladaLoader();
 
-		// load a Babylon resource
 		loader.load(
 			// resource URL
 			'models/collada/monster/monster.dae',
@@ -109,6 +109,6 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/OBJLoader.js examples/js/loaders/BabylonLoader.js]
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/ColladaLoader.js examples/js/loaders/ColladaLoader.js]
 	</body>
 </html>
