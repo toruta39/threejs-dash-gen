@@ -4,8 +4,12 @@ const util = require('util');
 const ncp = require('ncp').ncp;
 const es = require('event-stream');
 const connect = require('connect');
+const serveStatic = require('serve-static');
 const jsdom = require('jsdom');
 const sqlite3 = require('sqlite3').verbose();
+
+// Promisify ncp
+const ncpAsync = util.promisify(ncp);
 
 const { JSDOM } = jsdom;
 
@@ -16,90 +20,72 @@ const localServerPort = 9999;
 
 const startLocalServer = () => {
   server = connect()
-    .use(connect.static('threejs.docset/Contents/Resources/Documents'))
+    .use(serveStatic('threejs.docset/Contents/Resources/Documents'))
     .listen(localServerPort);
   console.log(`Local server started at http://localhost:${localServerPort}`);
 };
 
-const prepareDocuments = () => {
-  return new Promise((resolve, reject) => {
-    const _rmrf = (path) => {
-      const _fileList = fs.readdirSync(path);
+const prepareDocuments = async () => {
+  const _rmrf = (path) => {
+    const _fileList = fs.readdirSync(path);
 
-      _fileList.forEach((file, index) => {
-        const filePath = `${path}/${file}`;
+    _fileList.forEach((file, index) => {
+      const filePath = `${path}/${file}`;
 
-        if (fs.statSync(filePath).isFile()) {
-          fs.unlinkSync(filePath);
-        } else if (fs.statSync(filePath).isDirectory()) {
-          _rmrf(filePath);
-        }
-      });
-
-      fs.rmdirSync(path);
-    };
-
-    // Clean the previous build
-    if (fs.existsSync('threejs.docset/Contents/Resources/Documents')) {
-      _rmrf('threejs.docset/Contents/Resources/Documents');
-    }
-
-    // Copy docs folder
-    ncp('three.js/docs', 'threejs.docset/Contents/Resources/docs', {
-      transform: (read, write) => {
-        if (/\.html$/ig.test(read.path)) {
-          read = read
-            .pipe(es.replace(
-              '<script src="../../page.js"></script>',
-              '<script src="../../page.js"></script>' +
-              '<script src="../../offline.js"></script>'))
-            .pipe(es.replace(
-              '<script src="../../../page.js"></script>',
-              '<script src="../../../page.js"></script>' +
-              '<script src="../../../offline.js"></script>'))
-            .pipe(es.replace(
-              '<script src="../../../../page.js"></script>',
-              '<script src="../../../../page.js"></script>' +
-              '<script src="../../../../offline.js"></script>'))
-            .pipe(es.replace(
-              '<script src="../../build/three.min.js"></script>',
-              '<script src="../three.min.js"></script>'))
-            .pipe(es.replace(
-              '<script src=\'../../examples/js/libs/dat.gui.min.js\'></script>',
-              '<script src=\'../dat.gui.min.js\'></script>'));
-        }
-
-        read.pipe(write);
+      if (fs.statSync(filePath).isFile()) {
+        fs.unlinkSync(filePath);
+      } else if (fs.statSync(filePath).isDirectory()) {
+        _rmrf(filePath);
       }
-    }, (err) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      fs.renameSync('threejs.docset/Contents/Resources/docs',
-        'threejs.docset/Contents/Resources/Documents');
-
-      console.log('Preparation on Documents is done!');
-      resolve();
     });
+
+    fs.rmdirSync(path);
+  };
+
+  // Clean the previous build
+  if (fs.existsSync('threejs.docset/Contents/Resources/Documents')) {
+    _rmrf('threejs.docset/Contents/Resources/Documents');
+  }
+
+  // Copy docs folder
+  await ncpAsync('three.js/docs', 'threejs.docset/Contents/Resources/docs', {
+    transform: (read, write) => {
+      if (/\.html$/ig.test(read.path)) {
+        read = read
+          .pipe(es.replace(
+            '<script src="../../page.js"></script>',
+            '<script src="../../page.js"></script>' +
+            '<script src="../../offline.js"></script>'))
+          .pipe(es.replace(
+            '<script src="../../../page.js"></script>',
+            '<script src="../../../page.js"></script>' +
+            '<script src="../../../offline.js"></script>'))
+          .pipe(es.replace(
+            '<script src="../../../../page.js"></script>',
+            '<script src="../../../../page.js"></script>' +
+            '<script src="../../../../offline.js"></script>'))
+          .pipe(es.replace(
+            '<script src="../../build/three.min.js"></script>',
+            '<script src="../three.min.js"></script>'))
+          .pipe(es.replace(
+            '<script src=\'../../examples/js/libs/dat.gui.min.js\'></script>',
+            '<script src=\'../dat.gui.min.js\'></script>'));
+      }
+
+      read.pipe(write);
+    }
   });
+
+  fs.renameSync('threejs.docset/Contents/Resources/docs',
+    'threejs.docset/Contents/Resources/Documents');
+
+  console.log('Preparation on Documents is done!');
 };
 
-const injectFiles = () => {
-  return new Promise((resolve) => {
-    ncp('files', 'threejs.docset/Contents/Resources/Documents', resolve);
-  })
-  .then(() => {
-    return new Promise((resolve) => {
-      ncp('three.js/build/three.min.js', 'threejs.docset/Contents/Resources/Documents/three.min.js', resolve);
-    });
-  })
-  .then(() => {
-    return new Promise((resolve) => {
-      ncp('three.js/examples/js/libs/dat.gui.min.js', 'threejs.docset/Contents/Resources/Documents/dat.gui.min.js', resolve);
-    });
-  });
+const injectFiles = async () => {
+  await ncpAsync('files', 'threejs.docset/Contents/Resources/Documents');
+  await ncpAsync('three.js/build/three.module.min.js', 'threejs.docset/Contents/Resources/Documents/three.min.js');
+  await ncpAsync('three.js/examples/jsm/libs/lil-gui.module.min.js', 'threejs.docset/Contents/Resources/Documents/dat.gui.min.js');
 };
 
 const getPageListFromFiles = () => {
@@ -125,28 +111,29 @@ const getPageListFromFiles = () => {
   return urlList;
 };
 
-const getPageListFromJSON = () => {
-  return new Promise((resolve) => {
-    const _data = {};
-    const urlList = [];
+const getPageListFromJSON = async () => {
+  const urlList = [];
 
-    const listJsContent = fs.readFileSync('threejs.docset/Contents/Resources/' +
-      'Documents/list.js');
-    vm.runInNewContext(listJsContent, _data);
+  const listJsonContent = fs.readFileSync('threejs.docset/Contents/Resources/' +
+    'Documents/list.json', 'utf8');
+  const listData = JSON.parse(listJsonContent);
 
-    const grabURLFromJSON = (obj) => {
-      for (const i in obj) {
-        if (typeof obj[i] === 'object') {
-          grabURLFromJSON(obj[i]);
-        } else {
-          urlList.push(obj[i] + '.html');
-        }
+  const grabURLFromJSON = (obj) => {
+    for (const i in obj) {
+      if (typeof obj[i] === 'object') {
+        grabURLFromJSON(obj[i]);
+      } else {
+        urlList.push(obj[i] + '.html');
       }
-    };
+    }
+  };
 
-    grabURLFromJSON(_data.pages);
-    resolve(urlList);
-  });
+  // Process the English documentation section
+  if (listData.en && listData.en.Reference) {
+    grabURLFromJSON(listData.en.Reference);
+  }
+  
+  return urlList;
 };
 
 // UPDATED: Replace PhantomJS with jsdom
@@ -252,10 +239,19 @@ const getData = async (urlList) => {
   return data;
 };
 
-const writeSQLite = (data) => {
-  return new Promise((resolve) => {
+const writeSQLite = async (data) => {
+  const unlinkAsync = util.promisify(fs.unlink);
+  
+  // Remove existing database file
+  try {
+    await unlinkAsync(dbFile);
+  } catch (error) {
+    // File doesn't exist, that's fine
+  }
+
+  return new Promise((resolve, reject) => {
     let writeCount = 0;
-    let db = null;
+    const db = new sqlite3.Database(dbFile);
 
     const progress = (isRecordAdded) => {
       if (isRecordAdded) writeCount++;
@@ -266,30 +262,26 @@ const writeSQLite = (data) => {
       }
     };
 
-    fs.unlink(dbFile, () => {
-      db = new sqlite3.Database(dbFile);
+    db.serialize(() => {
+      db.run("CREATE TABLE searchIndex " +
+        "(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);");
+      db.run("CREATE UNIQUE INDEX anchor ON searchIndex " +
+        "(name, type, path);");
 
-      db.serialize(() => {
-        db.run("CREATE TABLE searchIndex " +
-          "(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);");
-        db.run("CREATE UNIQUE INDEX anchor ON searchIndex " +
-          "(name, type, path);");
-
-        for (const item of data) {
-          if (item.$name != null) {
-            db.run("INSERT OR IGNORE INTO searchIndex(name, type, path) " +
-              "VALUES (?, ?, ?);", [
-              item.$name,
-              item.$type,
-              item.$path
-            ], () => {
-              progress(true);
-            });
-          } else {
+      for (const item of data) {
+        if (item.$name != null) {
+          db.run("INSERT OR IGNORE INTO searchIndex(name, type, path) " +
+            "VALUES (?, ?, ?);", [
+            item.$name,
+            item.$type,
+            item.$path
+          ], () => {
             progress(true);
-          }
+          });
+        } else {
+          progress(true);
         }
-      });
+      }
     });
   });
 };

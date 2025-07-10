@@ -13,6 +13,7 @@
     "event-stream": "^4.0.1",
     "jsdom": "^23.0.0",
     "ncp": "^2.0.0",
+    "serve-static": "^2.2.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
