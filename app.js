@@ -85,7 +85,7 @@ const prepareDocuments = async () => {
 const injectFiles = async () => {
   await ncpAsync('files', 'threejs.docset/Contents/Resources/Documents');
   await ncpAsync('three.js/build/three.module.min.js', 'threejs.docset/Contents/Resources/Documents/three.min.js');
-  await ncpAsync('three.js/examples/jsm/libs/lil-gui.module.min.js', 'threejs.docset/Contents/Resources/Documents/dat.gui.min.js');
+  await ncpAsync('three.js/examples/jsm/libs/lil-gui.module.min.js', 'threejs.docset/Contents/Resources/Documents/lil-gui.module.min.js');
 };
 
 const getPageListFromFiles = () => {
