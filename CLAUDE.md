@@ -87,6 +87,7 @@ Three.js documentation consists of two main parts:
 
 ### Upload Generated Docset to Kapeli/Dash-User-Contributions
 
-Refer to: https://github.com/Kapeli/Dash-User-Contributions
+Check the README at <https://github.com/Kapeli/Dash-User-Contributions> for how to upload docset
 
+Example PR: <https://github.com/Kapeli/Dash-User-Contributions/pull/5472>
 
