@@ -84,3 +84,9 @@ Three.js documentation consists of two main parts:
 - `fs-extra`: Enhanced file operations
 - `glob`: File pattern matching
 - `connect` + `serve-static`: Local development server
+
+### Upload Generated Docset to Kapeli/Dash-User-Contributions
+
+Refer to: https://github.com/Kapeli/Dash-User-Contributions
+
+

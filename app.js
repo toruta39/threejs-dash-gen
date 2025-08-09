@@ -98,6 +98,7 @@ const injectFiles = async () => {
   );
   await fs.outputFile('threejs.docset/Contents/Info.plist', updatedPlistContent);
   
+  await fs.copy('icon.png', 'threejs.docset/icon.png');
   await fs.copy('injections', 'threejs.docset/Contents/Resources/Documents/docs');
   await fs.copy('injections', 'threejs.docset/Contents/Resources/Documents/manual');
   await fs.copy('three.js/files', 'threejs.docset/Contents/Resources/Documents/files');
