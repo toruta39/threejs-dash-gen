@@ -1,5 +1,4 @@
-Three.js Dash Docset Generator
-==============================
+# Three.js Dash Docset Generator
 
 ## About
 
@@ -17,7 +16,7 @@ To install:
 
 To generate:
 
-* Install [node.js](http://nodejs.org/), [CoffeeScript](http://coffeescript.org/) and [PhantomJS](http://phantomjs.org/) if you haven't installed them yet.
+* Install [node.js](http://nodejs.org/)
 * Clone this repo **with recursive flag**: `git clone --recursive https://github.com/toruta39/threejs-dash-gen`
 * In the repo's root directory, run: `npm install && npm start`
 * Open **threejs.docset** to install
