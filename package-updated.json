@@ -1,0 +1,38 @@
+{
+  "name": "threejs-docset-gen",
+  "version": "1.0.0",
+  "description": "Generate Three.js documentation as Dash docsets using jsdom",
+  "main": "app-updated.js",
+  "scripts": {
+    "start": "node app-updated.js && tar --exclude='.DS_Store' -cvzf threejs.tgz threejs.docset",
+    "dev": "node app-updated.js",
+    "build": "npm run start"
+  },
+  "dependencies": {
+    "connect": "^3.7.0",
+    "event-stream": "^4.0.1",
+    "jsdom": "^23.0.0",
+    "ncp": "^2.0.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "threejs",
+    "documentation",
+    "dash",
+    "docset",
+    "jsdom",
+    "generator"
+  ],
+  "author": "Joshua Zhang (@toruta39)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toruta39/threejs-dash-gen"
+  }
+}
